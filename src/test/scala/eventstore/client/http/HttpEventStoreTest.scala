@@ -29,7 +29,7 @@ class HttpEventStoreTest extends FunSpec with MustMatchers {
 
   it("executes fetches in the specified batch size") {
     val listener = mock(classOf[HttpEventStoreListener])
-    val eventstore = new HttpEventStore("127.0.0.1", 2113, batchSize = 5, listener)
+    val eventstore = new HttpEventStore("127.0.0.1", 2113, batchSize = 5, listener = listener)
 
     val stream = randomStream()
 
@@ -44,7 +44,7 @@ class HttpEventStoreTest extends FunSpec with MustMatchers {
   it("lazily fetches events as iterator is evaluated") {
     val stream = randomStream()
     val listener = mock(classOf[HttpEventStoreListener])
-    val eventstore = new HttpEventStore("127.0.0.1", 2113, batchSize = 5, listener)
+    val eventstore = new HttpEventStore("127.0.0.1", 2113, batchSize = 5, listener = listener)
 
     eventstore.write(stream, (1 to 20).map(i  => Event("hello", json("event" -> i.toString))).toList)
 

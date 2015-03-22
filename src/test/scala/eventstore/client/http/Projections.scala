@@ -2,22 +2,23 @@ package eventstore.client.http
 
 import java.io.PrintStream
 import java.net.URL
+
 import eventstore.client.http.ConnectionFactory.connectionFor
 
-import com.sun.org.apache.xml.internal.security.utils.Base64
-
 class Projections(hostname: String,
-                        port: Int) {
+                  port: Int,
+                  credentials: Option[Credentials]) {
   def create(name: String,
              content: String,
              emit: Boolean = false,
              checkpoints: Boolean = true,
              enabled: Boolean = true): Unit = {
-    val connection = connectionFor(new URL(s"http://$hostname:$port/projections/continuous?name=$name&emit=${format(emit)}&checkpoints=${format(checkpoints)}&enabled=${format(enabled)}"))
+    val connection = connectionFor(
+      new URL(s"http://$hostname:$port/projections/continuous?name=$name&emit=${format(emit)}&checkpoints=${format(checkpoints)}&enabled=${format(enabled)}"),
+      credentials
+    )
     connection.setRequestMethod("POST")
     connection.setRequestProperty("Accept", "*/*")
-
-    connection.setRequestProperty("Authorization", "Basic " + new String(Base64.encode("admin:changeit".getBytes("utf-8"))))
 
     val out = new PrintStream(connection.getOutputStream)
 

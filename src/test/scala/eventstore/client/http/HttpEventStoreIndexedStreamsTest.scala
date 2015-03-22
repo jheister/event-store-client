@@ -11,7 +11,7 @@ class HttpEventStoreIndexedStreamsTest extends FunSpec with MustMatchers {
     val streamB = randomStream()
     val indexedAandB = randomStream()
 
-    val projections = new Projections("localhost", 2113)
+    val projections = new Projections("localhost", 2113, Credentials.default)
 
     projections.create("index-" + streamA + "-" + streamB,
       s"""

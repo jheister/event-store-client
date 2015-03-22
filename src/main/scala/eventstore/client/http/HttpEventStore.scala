@@ -27,8 +27,15 @@ object UUIDMessageIdProvider extends MessageIdProvider {
   override def messageId(): String = UUID.randomUUID().toString
 }
 
+case class Credentials(user: String, pwd: String)
+
+case object Credentials {
+  val default = Some(Credentials("admin", "changeit"))
+}
+
 class HttpEventStore(hostname: String,
                      port: Int,
+                     credentials: Option[Credentials] = None,
                      batchSize: Int = 100,
                      listener: HttpEventStoreListener = NoopListener,
                      messageIdProvider: MessageIdProvider= UUIDMessageIdProvider) extends EventStore {
@@ -37,7 +44,7 @@ class HttpEventStore(hostname: String,
 
     val startingUrl = s"http://$hostname:$port/streams/$stream/$startingVersion/forward/$batchSize"
     
-    new EventIterator(new EventPageIterator(stream, startingUrl, listener))
+    new EventIterator(new EventPageIterator(stream, startingUrl, credentials, listener))
   }
 
   override def write(stream: String, event: List[Event], expectedVersion: Option[Long]): Unit = {
@@ -53,7 +60,7 @@ class HttpEventStore(hostname: String,
 
     val url = "http://" + hostname + ":" + port + "/streams/" + stream
 
-    val connection = ConnectionFactory.connectionFor(new URL(url))
+    val connection = ConnectionFactory.connectionFor(new URL(url), credentials)
 
     expectedVersion.foreach { v => connection.setRequestProperty("ES-ExpectedVersion", v.toString) }
     connection.setRequestProperty("Accept", "*/*")

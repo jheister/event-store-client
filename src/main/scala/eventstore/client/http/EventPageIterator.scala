@@ -5,7 +5,10 @@ import java.net.URL
 
 import net.liftweb.json.{DefaultFormats, JsonParser}
 
-class EventPageIterator(stream: String, startingUrl: String, listener: HttpEventStoreListener) extends Iterator[EventPage] {
+class EventPageIterator(stream: String,
+                        startingUrl: String,
+                        credentials: Option[Credentials],
+                        listener: HttpEventStoreListener) extends Iterator[EventPage] {
   private var nextElem: Option[String] = Some(startingUrl)
 
   override def hasNext: Boolean = nextElem.isDefined
@@ -20,7 +23,7 @@ class EventPageIterator(stream: String, startingUrl: String, listener: HttpEvent
   }
 
   private def readEventStreamFor(url: String): EventPage = {
-    val connection = ConnectionFactory.connectionFor(new URL(url))
+    val connection = ConnectionFactory.connectionFor(new URL(url), credentials)
     connection.setRequestMethod("GET")
     connection.setRequestProperty("Accept", "application/json")
 
