@@ -26,9 +26,17 @@ class HttpEventStoreIndexedStreamsTest extends FunSpec with MustMatchers {
     eventstore.write(streamA, List(event(1), event(2)))
     eventstore.write(streamB, List(event(3), event(4)))
 
-    Thread.sleep(1000)//need to work out what to do to wait for stream to exist
+    await(4)(() => eventstore.fromStream(indexedAandB)).map(_.event).toList must be(List(event(1), event(2), event(3), event(4)))
+  }
 
-    eventstore.fromStream(indexedAandB).map(_.event).toList must be(List(event(1), event(2), event(3), event(4)))
+  def await[T](count: Int, times: Int = 100)(f: () => Iterator[T]): Iterator[T] = {
+    val data = f().toList
+    if (data.size >= count) {
+      data.toIterator
+    } else {
+      Thread.sleep(10)
+      await(count - 1, times - 1)(f)
+    }
   }
 }
 
