@@ -28,7 +28,8 @@ object UUIDMessageIdProvider extends MessageIdProvider {
 }
 
 class HttpEventStore(hostname: String,
-                     port: Int, batchSize: Int = 100,
+                     port: Int,
+                     batchSize: Int = 100,
                      listener: HttpEventStoreListener = NoopListener,
                      messageIdProvider: MessageIdProvider= UUIDMessageIdProvider) extends EventStore {
   override def fromStream(stream: String, eventsAfter: Option[Long] = None): Iterator[EventInStream] = {

@@ -26,7 +26,7 @@ object EventStorePlugin {
     },
     startES := {
       val startScript: File = esDir.value / "start.sh"
-      IO.write(startScript, "./run-node.sh --mem-db &")
+      IO.write(startScript, "./run-node.sh --mem-db --run-projections All &")
       startScript.setExecutable(true)
 
       Process("./start.sh", esDir.value).lines_!.foreach(println)
